@@ -1,14 +1,31 @@
-from django.db import models
+from django.contrib import admin
+from .models import Course, Lesson, Instructor, Learner, Question, Choice, Submission
 
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    is_correct = models.BooleanField(default=False)
+class ChoiceInline(admin.TabularInline):
+    model = Choice
+    extra = 1
 
-class Submission(models.Model):
-    user = models.CharField(max_length=100)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    selected_choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
+
+class QuestionInline(admin.TabularInline):
+    model = Question
+    extra = 1
+
+
+class QuestionAdmin(admin.ModelAdmin):
+    inlines = [ChoiceInline]
+    list_display = ('question_text',)
+
+
+class LessonAdmin(admin.ModelAdmin):
+    inlines = [QuestionInline]
+    list_display = ('title',)
+
+
+admin.site.register(Course)
+admin.site.register(Lesson, LessonAdmin)
+admin.site.register(Instructor)
+admin.site.register(Learner)
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(Choice)
+admin.site.register(Submission)
